@@ -9,8 +9,8 @@ export const CommentList = ({ comments, slug }) => {
       <h2>Comentários</h2>
       <ul>
         {comments.map((comment) => (
-          <li>
-            <Comment comment={comment} key={comment.id} />
+          <li key={comment.id}>
+            <Comment comment={comment}  />
             <ReplyModal comment={comment} />
             <Replies comment={comment} slug={slug} />
           </li>

@@ -1,15 +1,28 @@
 "use client";
-
+import { useQuery } from '@tanstack/react-query';
 import { CardPost } from "@/components/CardPost";
 import { CommentList } from "@/components/CommentList";
 import styles from "./page.module.css";
+import { fetchPostRating } from '@/app/page';
+
+const fetchPostbySlug = async({slug}) => {
+  const results = await fetch(`http://localhost:3000/api/post/${slug}`);
+  const data = await results.json();
+  return data;
+}
 
 const PagePost = ({ params }) => {
   const { slug } = params;
+  const { data: post } = useQuery({
+    queryKey: ['post', slug],
+    queryFn: () => fetchPostbySlug({ slug }),
+  }); 
 
-  const post = null;
-
-  const postRating = null;
+  const {data: postRating } = useQuery({
+    queryKey: ['postRating', post?.id],
+    queryFn: () => fetchPostRating({ postId: post?.id }),
+    enabled: !!post?.id,
+  })
 
   return (
     <div>

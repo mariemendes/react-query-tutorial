@@ -2,6 +2,8 @@ import { Prompt } from "next/font/google";
 import { Aside } from "@/components/Aside";
 import "./globals.css";
 import { SearchForm } from "@/components/SearchForm";
+import { ReactQueryProvider } from "./ReactQueryProvider";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 export const metadata = {
   title: "Code Connect",
@@ -14,20 +16,24 @@ const prompt = Prompt({
   display: "swap",
 });
 
+//only one instance to all the bodies
 export default function RootLayout({ children }) {
   return (
     <html lang="pt-br" className={prompt.className}>
-      <body>
-        <div className="app-container">
-          <div>
-            <Aside />
+      <ReactQueryProvider>
+            <body>
+          <div className="app-container">
+            <div>
+              <Aside />
+            </div>
+            <div className="main-content">
+              <SearchForm />
+              {children}
+            </div>
+            <ReactQueryDevtools initialIsOpen={false} position="bottom"/>
           </div>
-          <div className="main-content">
-            <SearchForm />
-            {children}
-          </div>
-        </div>
-      </body>
+        </body>
+      </ReactQueryProvider>
     </html>
   );
 }
