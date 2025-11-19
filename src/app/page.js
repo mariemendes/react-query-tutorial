@@ -1,47 +1,24 @@
 "use client";
-import { useQuery, useQueries } from "@tanstack/react-query"; //responsible to help us to fetch the data
+// import { useQuery, useQueries } from "@tanstack/react-query"; //responsible to help us to fetch the data
+import { useFetchPosts } from "./hooks/useFetchPosts";
+import { usePostRatingQueries } from "./hooks/useFetchRating";
 import { CardPost } from "@/components/CardPost";
 import { Spinner } from "@/components/Spinner";
 import styles from "./page.module.css";
 import Link from "next/link";
-
-//receiveing the posts and do the pagination
-const fetchPosts = async ({ page }) => {
-  const results = await fetch(`http://localhost:3000/api/posts?page=${page}`);
-  const data = await results.json();
-  return data;
-}
-export const fetchPostRating = async ({postId}) => {
-  const results = await fetch(`http://localhost:3000/api/post?postId=${postId}`);
-  const data = await results.json();
-  return data;
-}
 
 export default function Home({ searchParams }) {
   const currentPage = parseInt(searchParams?.page || 1);
   const searchTerm = searchParams?.q;
 
   //when there are requests in the background the isFetching is reponsible to tell us.
-  const { data: posts, isLoading, isFetching} = useQuery({
-    //key is a unique value and means that the userQuery will manage the cache and the state
-    queryKey: ["posts", currentPage],
-    //where to search -- search inside fetchposts page number XX
-    queryFn: () => fetchPosts({ page: currentPage }),
-    //updated data each 6sec 
-    staleTime: 6000, 
-  })  
+  const { data: posts, isLoading, isFetching } = useFetchPosts({
+    page: currentPage,
+  });
 
   //arr of queries
-  const postRatingQueries = useQueries({
-    queries: 
-      posts?.data.length > 0 ? 
-        posts.data.map((post) => ({
-          queryKey: ["postHome", post.id],
-          queryFn: () => fetchPostRating({postId: post.id}),
-          enabled: !!post.id,
-        }))
-      : [],
-  })
+  const postRatingQueries = usePostRatingQueries( posts )
+
   const ratingsAndCartegoriesMap = postRatingQueries?.reduce((acc, query) => {
     if(!query.isPending && query.data && query.data.id){
       acc[query.data.id] = query.data;
